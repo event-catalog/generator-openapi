@@ -1,6 +1,5 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIDocument, OpenAPIOperation, OpenAPIParameter, Operation } from '../types';
-import { OpenAPIV3_1 } from "openapi-types";
 
 const DEFAULT_MESSAGE_TYPE = 'query';
 

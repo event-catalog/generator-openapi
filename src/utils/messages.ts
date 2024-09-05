@@ -1,6 +1,7 @@
 import { OpenAPI } from 'openapi-types';
 import { getSchemasByOperationId } from './openapi';
 import { OpenAPIOperation, OpenAPIParameter, Operation } from '../types';
+import slugify from 'slugify';
 
 const markdownForParameters = (parameters: OpenAPIParameter[]) => {
   let markdown = '### Parameters\n';
@@ -86,8 +87,7 @@ export const getSummary = (message: Operation) => {
   return eventCatalogMessageSummary;
 };
 
-export const buildMessage = async (pathToFile: string, document: OpenAPI.Document,  operation: Operation) => {
-
+export const buildMessage = async (pathToFile: string, document: OpenAPI.Document, operation: Operation) => {
   const requestBodiesAndResponses = await getSchemasByOperationId(pathToFile, operation.operationId);
 
   const operationTags = operation.tags.map((badge) => ({
@@ -98,14 +98,22 @@ export const buildMessage = async (pathToFile: string, document: OpenAPI.Documen
 
   const badges = [{ content: operation.method.toUpperCase(), textColor: 'blue', backgroundColor: 'blue' }, ...operationTags];
 
+  const apiName = slugify(document.info.title, { lower: true });
+  const path = operation.path.replace(/\//, '').replace(/\//g, '_');
+  let uniqueIdentifier = operation.operationId || `${apiName}_${operation.method}`;
+
+  if (!operation.operationId && path) {
+    uniqueIdentifier = uniqueIdentifier.concat(`_${path}`);
+  }
+
   return {
-    id: operation.operationId,
+    id: uniqueIdentifier,
     version: document.info.version,
-    name: operation.operationId,
+    name: uniqueIdentifier,
     summary: getSummary(operation),
     markdown: defaultMarkdown(operation, requestBodiesAndResponses),
     schemaPath: requestBodiesAndResponses?.requestBody ? 'request-body.json' : '',
     badges,
-    requestBodiesAndResponses
+    requestBodiesAndResponses,
   };
 };

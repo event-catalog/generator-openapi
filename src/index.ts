@@ -10,6 +10,7 @@ import { getOperationsByType } from './utils/openapi';
 import { Domain } from './types';
 import { getMessageTypeUtils } from './utils/catalog-shorthand';
 import { OpenAPI } from 'openapi-types';
+import checkLicense from './utils/checkLicense';
 
 type Props = {
   path: string | string[];
@@ -130,12 +131,9 @@ export default async (_: any, options: Props) => {
     );
 
     console.log(chalk.cyan(` - Service (v${version}) created`));
-
-    console.log(chalk.green(`\nFinished generating event catalog for OpenAPI ${service.name} (v${version})`));
-
-    console.log(chalk.bgBlue(`\nYou are using a free version of this plugin`));
-    console.log(chalk.blueBright(`This plugin is governed and published under the AGPL-3.0 copy-left license. \nIf using for commercial purposes or proprietary software, please contact hello@eventcatalog.dev for a license to support the project.`));
   }
+
+  await checkLicense();
 };
 
 const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenAPI.Document) => {
@@ -145,7 +143,6 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
 
   // Go through all messages
   for (const operation of operations) {
-
     const { requestBodiesAndResponses, ...message } = await buildMessage(pathToSpec, document, operation);
     let messageMarkdown = message.markdown;
     const messageType = operation.type;
@@ -173,11 +170,11 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     }
 
     // Write the message to the catalog
-    await writeMessage({...message, markdown: messageMarkdown}, { path: message.name });
+    await writeMessage({ ...message, markdown: messageMarkdown }, { path: message.name });
 
     // messages will always be messages the service receives
     receives.push({
-      id: operation.operationId,
+      id: message.id,
       version: message.version,
     });
 
@@ -207,6 +204,10 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     }
 
     console.log(chalk.cyan(` - Message (v${version}) created`));
+    if (!operation.operationId) {
+      console.log(chalk.yellow(`  - OperationId not found for ${operation.method} ${operation.path}, creating one...`));
+      console.log(chalk.yellow(`  - Use operationIds to give better unique names for EventCatalog`));
+    }
   }
   return { receives, sends: [] };
 };

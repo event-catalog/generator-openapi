@@ -36,5 +36,4 @@ export const getMessageTypeUtils = (projectDirectory: string, messageType: strin
     writeMessage: writeCommand,
     addFileToMessage: addFileToCommand,
   };
-  
 };
