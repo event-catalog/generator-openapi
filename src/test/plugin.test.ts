@@ -394,6 +394,18 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(command.name).toEqual('createPets');
       });
 
+      it('when the message (operation) does not have a operationId, the path and status code is used to uniquely identify the message', async () => {
+        const { getCommand } = utils(catalogDir);
+
+        await plugin(config, { path: join(openAPIExamples, 'without-operationIds.yml') });
+
+        const getCommandByProductId = await getCommand('product-api_GET_{productId}');
+        const getCommandMessage = await getCommand('product-api_GET');
+
+        expect(getCommandByProductId).toBeDefined();
+        expect(getCommandMessage).toBeDefined();
+      });
+
       describe('schemas', () => {
         it('when a message has a request body, the request body is the schema of the message', async () => {
           const { getCommand } = utils(catalogDir);

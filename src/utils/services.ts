@@ -29,8 +29,7 @@ export const getSummary = (document: OpenAPI.Document) => {
   return summary && summary.length < 150 ? summary : '';
 };
 
-
-export const buildService = (pathToFile:string, document: OpenAPI.Document) => {
+export const buildService = (pathToFile: string, document: OpenAPI.Document) => {
   const schemaPath = pathToFile.split('/').pop() || 'openapi.yml';
   const documentTags = document.tags || [];
   return {
@@ -40,6 +39,6 @@ export const buildService = (pathToFile:string, document: OpenAPI.Document) => {
     summary: getSummary(document),
     schemaPath,
     markdown: defaultMarkdown(document, schemaPath),
-    badges: documentTags.map((tag) => ({ content: tag.name, textColor: 'blue', backgroundColor: 'blue' }))
-  }
+    badges: documentTags.map((tag) => ({ content: tag.name, textColor: 'blue', backgroundColor: 'blue' })),
+  };
 };
