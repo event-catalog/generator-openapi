@@ -5,8 +5,8 @@
 
 _Dual license of this project allows us to keep opens source and make EventCatalog sustainable_.
 
-
 ## AGPL-3.0 License (Open Source)
+
 This software is licensed under the terms of the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.en.html) (AGPL-3.0), a copy-left open-source license that allows you to use, modify, and distribute the software under the following conditions:
 
 If you modify this software or create derivative works, you must make the source code of those modifications available under the same AGPL-3.0 license when:
