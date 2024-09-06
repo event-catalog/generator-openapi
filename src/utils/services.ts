@@ -9,9 +9,6 @@ ${document.info.description ? `${document.info.description}` : ''}
 ## Architecture diagram
 <NodeGraph />
 
-## OpenAPI Specification
-<OpenAPI file="${fileName}"/>
-
 ${
   document.externalDocs
     ? `
