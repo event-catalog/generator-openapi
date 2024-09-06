@@ -12,8 +12,8 @@ dependencies:
     specifier: ^2.27.7
     version: 2.27.7
   '@eventcatalog/sdk':
-    specifier: ^0.0.12
-    version: 0.0.12
+    specifier: ^0.1.1
+    version: 0.1.1
   chalk:
     specifier: ^4
     version: 4.1.2
@@ -712,8 +712,8 @@ packages:
     dev: true
     optional: true
 
-  /@eventcatalog/sdk@0.0.12:
-    resolution: {integrity: sha512-N6Zk7gkLdf+aYcRbWOWcV1QogsoEuvIMhZmP0e+W74RQLKdhx3rTk/Ru/UG3gi/KvMg6X6QIwTMcbyhjdSfUXg==}
+  /@eventcatalog/sdk@0.1.1:
+    resolution: {integrity: sha512-f5eIp4xuKLbDg2jh3MIn/9ll+HZxu2rjzg2t8SaHWo6rTlMT9qudO14glrbsOy/6AUVC7fpK6S9igMsbHZuz0w==}
     dependencies:
       '@changesets/cli': 2.27.7
       fs-extra: 11.2.0

@@ -54,6 +54,7 @@ export default async (_: any, options: Props) => {
 
     const service = buildService(path, document);
     let serviceMarkdown = service.markdown;
+    let serviceSpecifications = service.specifications;
 
     // Manage domain
     if (options.domain) {
@@ -99,6 +100,13 @@ export default async (_: any, options: Props) => {
     if (latestServiceInCatalog) {
       serviceMarkdown = latestServiceInCatalog.markdown;
       sends = latestServiceInCatalog.sends || ([] as any);
+
+      // persist any specifications that are already in the catalog
+      serviceSpecifications = {
+        ...serviceSpecifications,
+        ...latestServiceInCatalog.specifications,
+      };
+
       // Found a service, and versions do not match, we need to version the one already there
       if (latestServiceInCatalog.version !== version) {
         await versionService(service.id);
@@ -115,6 +123,7 @@ export default async (_: any, options: Props) => {
       {
         ...service,
         markdown: serviceMarkdown,
+        specifications: serviceSpecifications,
         sends,
         receives,
       },
