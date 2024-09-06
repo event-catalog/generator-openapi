@@ -267,6 +267,41 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(schema).toBeDefined();
       });
 
+      it('the openapi file is added to the specifications list in eventcatalog', async () => {
+        const { getService, writeService } = utils(catalogDir);
+
+        await plugin(config, { path: join(openAPIExamples, 'petstore.yml') });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.specifications?.openapiPath).toEqual('petstore.yml');
+      });
+
+      it('if the service already has specifications they are persisted and the openapi one is added on', async () => {
+        const { getService, writeService } = utils(catalogDir);
+        
+
+        await writeService(
+          {
+            id: 'swagger-petstore',
+            version: '0.0.1',
+            name: 'Swagger Petstore',
+            specifications: {
+              asyncapiPath: 'asyncapi.yml',
+            },
+            markdown: '',
+          },
+          { path: 'Swagger Petstore' }
+        );
+
+        await plugin(config, { path: join(openAPIExamples, 'petstore.yml') });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.specifications?.asyncapiPath).toEqual('asyncapi.yml');
+        expect(service.specifications?.openapiPath).toEqual('petstore.yml');
+      });
+
       it('all endpoints in the OpenAPI spec are messages the service receives', async () => {
         const { getService } = utils(catalogDir);
 
