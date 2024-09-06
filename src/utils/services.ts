@@ -39,7 +39,7 @@ export const buildService = (pathToFile: string, document: OpenAPI.Document) => 
     summary: getSummary(document),
     schemaPath,
     specifications: {
-      openapiPath: schemaPath
+      openapiPath: schemaPath,
     },
     markdown: defaultMarkdown(document, schemaPath),
     badges: documentTags.map((tag) => ({ content: tag.name, textColor: 'blue', backgroundColor: 'blue' })),

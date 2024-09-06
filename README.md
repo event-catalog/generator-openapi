@@ -6,8 +6,6 @@
 <img src="https://img.shields.io/github/actions/workflow/status/event-catalog/generator-asyncapi/verify-build.yml"/>
 [![](https://dcbadge.limes.pink/api/server/https://discord.gg/3rjaZMmrAm?style=flat)](https://discord.gg/3rjaZMmrAm) [<img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="20px" />](https://www.linkedin.com/in/david-boyne/) [![blog](https://img.shields.io/badge/license-Dual--License-brightgreen)](https://github.com/event-catalog/generator-openapi/blob/main/LICENSE.md)
 
-
-
 <img alt="header" src="./images/openapi.png" />
 
 <h4>Features: Generate EventCatalogs with your OpenAPI files, Auto versioning, schema downloads, map to domains, custom OpenAPI extensions and more... </h4>

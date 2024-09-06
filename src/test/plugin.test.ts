@@ -279,7 +279,6 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
       it('if the service already has specifications they are persisted and the openapi one is added on', async () => {
         const { getService, writeService } = utils(catalogDir);
-        
 
         await writeService(
           {
