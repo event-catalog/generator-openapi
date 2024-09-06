@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 0.0.4
+
+### Patch Changes
+
+- 025892f: feat(plugin): openapi spec file is now added to the specifications in…
+
 ## 0.0.3
 
 ### Patch Changes
