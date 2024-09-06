@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 0.0.5
+
+### Patch Changes
+
+- 2d97a98: chore(plugin): removed old MDX component
+
 ## 0.0.4
 
 ### Patch Changes
