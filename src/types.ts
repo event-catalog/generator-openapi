@@ -6,6 +6,11 @@ export type Domain = {
   version: string;
 };
 
+export type Service = {
+  id?: string;
+  path: string;
+};
+
 export type Operation = {
   path: string;
   method: string;
