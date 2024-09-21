@@ -9,6 +9,7 @@ export type Domain = {
 export type Service = {
   id?: string;
   path: string;
+  folderName?: string;
 };
 
 export type Operation = {

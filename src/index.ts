@@ -51,7 +51,7 @@ export default async (_: any, options: Props) => {
     const document = await SwaggerParser.parse(serviceSpec.path);
     const version = document.info.version;
 
-    const service = buildService(serviceSpec.path, document);
+    const service = buildService(serviceSpec, document);
     let serviceMarkdown = service.markdown;
     let serviceSpecifications = service.specifications;
 
@@ -126,7 +126,7 @@ export default async (_: any, options: Props) => {
         sends,
         receives,
       },
-      { path: service.name }
+      { path: serviceSpec.folderName || service.name }
     );
 
     await addFileToService(

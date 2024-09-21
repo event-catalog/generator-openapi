@@ -315,6 +315,26 @@ describe('OpenAPI EventCatalog Plugin', () => {
           { id: 'petAdopted', version: '1.0.0' },
         ]);
       });
+
+      describe('service options', () => {
+        describe('config option: id', () => {
+          it('if an `id` value is given in the service config options, then the generator uses that id and does not generate one from the title', async () => {
+            const { getService } = utils(catalogDir);
+
+            await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'my-custom-service-name' }] });
+
+            const service = await getService('my-custom-service-name', '1.0.0');
+
+            expect(service).toBeDefined();
+          });
+        });
+        describe('config option: folderName', () => {
+          it('if the `folderName` value is given in the service config options, then the service is written to that foldername', async () => {
+            await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), folderName: 'HelloWorld' }] });
+            expect(await fs.readdir(join(catalogDir, 'services'))).toContain('HelloWorld');
+          });
+        });
+      });
     });
 
     describe('messages', () => {

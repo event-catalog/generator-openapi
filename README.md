@@ -41,7 +41,10 @@ generators: [
     [
       '@eventcatalogtest/generator-openapi',
       {
-        path: [path.join(__dirname, 'openapi-files', 'petstore.yml'),
+        services: [
+          { path: [path.join(__dirname, 'openapi-files', 'petstore.yml') },
+          { path: [path.join(__dirname, 'openapi-files', 'account-service.yml'), id: 'account-service', folderName: 'Account Service' },
+        ],
         domain: { id: 'orders', name: 'Orders', version: '0.0.1' },
       },
     ],
