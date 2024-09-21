@@ -7,13 +7,13 @@ import { defaultMarkdown as generateMarkdownForDomain } from './utils/domains';
 import { buildService } from './utils/services';
 import { buildMessage } from './utils/messages';
 import { getOperationsByType } from './utils/openapi';
-import { Domain } from './types';
+import { Domain, Service } from './types';
 import { getMessageTypeUtils } from './utils/catalog-shorthand';
 import { OpenAPI } from 'openapi-types';
 import checkLicense from './utils/checkLicense';
 
 type Props = {
-  path: string | string[];
+  services: Service[];
   domain?: Domain;
   debug?: boolean;
 };
@@ -35,24 +35,23 @@ export default async (_: any, options: Props) => {
     addFileToService,
   } = utils(process.env.PROJECT_DIR);
 
-  const openAPIFiles = Array.isArray(options.path) ? options.path : [options.path];
-
-  for (const path of openAPIFiles) {
-    console.log(chalk.green(`Processing ${path}`));
+  const services = options.services ?? [];
+  for (const serviceSpec of services) {
+    console.log(chalk.green(`Processing ${serviceSpec.path}`));
 
     try {
-      await SwaggerParser.validate(path);
+      await SwaggerParser.validate(serviceSpec.path);
     } catch (error) {
-      console.error(chalk.red(`Failed to parse OpenAPI file: ${path}`));
+      console.error(chalk.red(`Failed to parse OpenAPI file: ${serviceSpec.path}`));
       console.error(chalk.red(error));
       continue;
     }
 
-    const openAPIFile = await readFile(path, 'utf-8');
-    const document = await SwaggerParser.parse(path);
+    const openAPIFile = await readFile(serviceSpec.path, 'utf-8');
+    const document = await SwaggerParser.parse(serviceSpec.path);
     const version = document.info.version;
 
-    const service = buildService(path, document);
+    const service = buildService(serviceSpec, document);
     let serviceMarkdown = service.markdown;
     let serviceSpecifications = service.specifications;
 
@@ -91,7 +90,7 @@ export default async (_: any, options: Props) => {
     }
 
     // Process all messages for the OpenAPI spec
-    let { sends, receives } = await processMessagesForOpenAPISpec(path, document);
+    let { sends, receives } = await processMessagesForOpenAPISpec(serviceSpec.path, document);
 
     // Check if service is already defined... if the versions do not match then create service.
     const latestServiceInCatalog = await getService(service.id, 'latest');
@@ -127,7 +126,7 @@ export default async (_: any, options: Props) => {
         sends,
         receives,
       },
-      { path: service.name }
+      { path: serviceSpec.folderName || service.name }
     );
 
     await addFileToService(
