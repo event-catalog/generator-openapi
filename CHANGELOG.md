@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 1.0.0
+
+### Major Changes
+
+- a7dd194: feat(plugin): plugin now accepts services, path, id and folderName
+
 ## 0.0.5
 
 ### Patch Changes
