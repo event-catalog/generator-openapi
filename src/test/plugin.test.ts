@@ -97,12 +97,13 @@ describe('OpenAPI EventCatalog Plugin', () => {
         const { getDomain } = utils(catalogDir);
 
         await plugin(config, {
-          services: [{ path: join(openAPIExamples, 'petstore.yml') }, { path: join(openAPIExamples, 'simple.yml') }],
+          services: [{ path: join(openAPIExamples, 'petstore.yml') }, { path: join(openAPIExamples, 'simple.openapi.yml') }],
           domain: { id: 'orders', name: 'Orders', version: '1.0.0' },
         });
 
         const domain = await getDomain('orders', 'latest');
 
+        console.log(domain.services);
         expect(domain.services).toHaveLength(2);
         expect(domain.services).toEqual([
           { id: 'swagger-petstore', version: '1.0.0' },
@@ -267,7 +268,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
       });
 
       it('the openapi file is added to the specifications list in eventcatalog', async () => {
-        const { getService, writeService } = utils(catalogDir);
+        const { getService } = utils(catalogDir);
 
         await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml') }] });
 
@@ -277,27 +278,39 @@ describe('OpenAPI EventCatalog Plugin', () => {
       });
 
       it('if the service already has specifications they are persisted and the openapi one is added on', async () => {
-        const { getService, writeService } = utils(catalogDir);
-
+        const { getService, writeService, addFileToService } = utils(catalogDir);
+        const existingVersion = '2.0.0';
         await writeService(
           {
-            id: 'swagger-petstore',
-            version: '0.0.1',
-            name: 'Swagger Petstore',
+            id: 'simple-api-overview',
+            version: existingVersion,
+            name: 'Simple API overview',
             specifications: {
-              asyncapiPath: 'asyncapi.yml',
+              asyncapiPath: 'simple.asyncapi.yml',
             },
             markdown: '',
           },
-          { path: 'Swagger Petstore' }
+          { path: 'Simple API overview' }
         );
 
-        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml') }] });
+        await addFileToService(
+          'simple-api-overview',
+          {
+            fileName: 'simple.asyncapi.yml',
+            content: 'Some content',
+          },
+          existingVersion
+        );
 
-        const service = await getService('swagger-petstore', '1.0.0');
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'simple.openapi.yml') }] });
 
-        expect(service.specifications?.asyncapiPath).toEqual('asyncapi.yml');
-        expect(service.specifications?.openapiPath).toEqual('petstore.yml');
+        const service = await getService('simple-api-overview', existingVersion);
+
+        expect(service.specifications?.asyncapiPath).toEqual('simple.asyncapi.yml');
+        expect(service.specifications?.openapiPath).toEqual('simple.openapi.yml');
+
+        const existingSpecFile = await fs.readFile(join(catalogDir, 'services', 'Simple API overview', 'simple.asyncapi.yml'));
+        expect(existingSpecFile).toBeDefined();
       });
 
       it('all endpoints in the OpenAPI spec are messages the service receives', async () => {

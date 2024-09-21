@@ -11,11 +11,23 @@ import { Domain, Service } from './types';
 import { getMessageTypeUtils } from './utils/catalog-shorthand';
 import { OpenAPI } from 'openapi-types';
 import checkLicense from './utils/checkLicense';
+import { join } from 'node:path';
 
 type Props = {
   services: Service[];
   domain?: Domain;
   debug?: boolean;
+};
+
+const loadSpecFiles = (specifications: {}, speciFiles: { fileName: string; content: string }[], service: Service) => {
+  Object.values(specifications).map(async (value) => {
+    if (typeof value === 'string') {
+      speciFiles.push({
+        fileName: value,
+        content: await readFile(join(service.path.split('/').slice(0, -1).join('/'), value), 'utf8'),
+      });
+    }
+  });
 };
 
 export default async (_: any, options: Props) => {
@@ -54,6 +66,7 @@ export default async (_: any, options: Props) => {
     const service = buildService(serviceSpec, document);
     let serviceMarkdown = service.markdown;
     let serviceSpecifications = service.specifications;
+    const speciFiles: { fileName: string; content: string }[] = [];
 
     // Manage domain
     if (options.domain) {
@@ -114,6 +127,7 @@ export default async (_: any, options: Props) => {
 
       // Match found, override it
       if (latestServiceInCatalog.version === version) {
+        loadSpecFiles(serviceSpecifications, speciFiles, serviceSpec);
         await rmService(service.name);
       }
     }
@@ -128,6 +142,10 @@ export default async (_: any, options: Props) => {
       },
       { path: serviceSpec.folderName || service.name }
     );
+
+    speciFiles.map(async (value) => {
+      await addFileToService(service?.id, value, version);
+    });
 
     await addFileToService(
       service.id,
