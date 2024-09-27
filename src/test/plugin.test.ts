@@ -438,6 +438,65 @@ describe('OpenAPI EventCatalog Plugin', () => {
         ]);
       });
 
+      it('all the endpoints in the OpenAPI spec are messages the service `receives`. If the version matches the latest the receives are persisted', async () => {
+        // Create a service with the same name and version as the OpenAPI file for testing
+        const { writeService, getService } = utils(catalogDir);
+
+        await writeService(
+          {
+            id: 'swagger-petstore',
+            version: '1.0.0',
+            name: 'Random Name',
+            markdown: 'Here is my original markdown, please do not override this!',
+            receives: [{ id: 'userloggedin', version: '1.0.0' }],
+          },
+          { path: 'Swagger Petstore' }
+        );
+
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+        expect(service.receives).toHaveLength(5);
+        expect(service.receives).toEqual([
+          { id: 'userloggedin', version: '1.0.0' },
+          { id: 'listPets', version: '1.0.0' },
+          { id: 'createPets', version: '1.0.0' },
+          { id: 'showPetById', version: '1.0.0' },
+          { id: 'petAdopted', version: '1.0.0' },
+        ]);
+      });
+
+      it('all the endpoints in the OpenAPI spec are messages the service `receives`. If the version matches the latest the receives are persisted, any duplicated are removed', async () => {
+        // Create a service with the same name and version as the OpenAPI file for testing
+        const { writeService, getService } = utils(catalogDir);
+
+        await writeService(
+          {
+            id: 'swagger-petstore',
+            version: '1.0.0',
+            name: 'Random Name',
+            markdown: 'Here is my original markdown, please do not override this!',
+            receives: [
+              { id: 'listPets', version: '1.0.0' },
+              { id: 'createPets', version: '1.0.0' },
+            ],
+          },
+          { path: 'Swagger Petstore' }
+        );
+
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+        expect(service.receives).toHaveLength(4);
+
+        expect(service.receives).toEqual([
+          { id: 'listPets', version: '1.0.0' },
+          { id: 'createPets', version: '1.0.0' },
+          { id: 'showPetById', version: '1.0.0' },
+          { id: 'petAdopted', version: '1.0.0' },
+        ]);
+      });
+
       describe('service options', () => {
         describe('config option: id', () => {
           it('if an `id` value is given in the service config options, then the generator uses that id and does not generate one from the title', async () => {
