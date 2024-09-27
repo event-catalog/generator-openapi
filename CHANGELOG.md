@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 2.0.1
+
+### Patch Changes
+
+- a5a87ff: feat(plugin): persist messages the service receives and sends
+
 ## 2.0.0
 
 ### Major Changes
