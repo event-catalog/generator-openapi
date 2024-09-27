@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 2.0.0
+
+### Major Changes
+
+- 4e3ed77: feat(plugin): breaking change - persist spec files between services a…
+
 ## 1.0.0
 
 ### Major Changes
