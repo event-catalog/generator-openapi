@@ -30,9 +30,10 @@ export default async (_: any, options: Props) => {
     addServiceToDomain,
     getService,
     versionService,
-    rmService,
+    rmServiceById,
     writeService,
     addFileToService,
+    getSpecificationFilesForService,
   } = utils(process.env.PROJECT_DIR);
 
   const services = options.services ?? [];
@@ -53,6 +54,7 @@ export default async (_: any, options: Props) => {
 
     const service = buildService(serviceSpec, document);
     let serviceMarkdown = service.markdown;
+    let serviceSpecificationsFiles = [];
     let serviceSpecifications = service.specifications;
 
     // Manage domain
@@ -98,6 +100,7 @@ export default async (_: any, options: Props) => {
 
     if (latestServiceInCatalog) {
       serviceMarkdown = latestServiceInCatalog.markdown;
+      serviceSpecificationsFiles = await getSpecificationFilesForService(service.id, 'latest');
       sends = latestServiceInCatalog.sends || ([] as any);
 
       // persist any specifications that are already in the catalog
@@ -114,7 +117,7 @@ export default async (_: any, options: Props) => {
 
       // Match found, override it
       if (latestServiceInCatalog.version === version) {
-        await rmService(service.name);
+        await rmServiceById(service.id);
       }
     }
 
@@ -126,17 +129,29 @@ export default async (_: any, options: Props) => {
         sends,
         receives,
       },
-      { path: serviceSpec.folderName || service.name }
+      { path: service.id }
     );
 
-    await addFileToService(
-      service.id,
+    // What files need added to the service (speficiation files)
+    const specFiles = [
+      // add any previous spec files to the list
+      ...serviceSpecificationsFiles,
       {
-        fileName: service.schemaPath,
         content: openAPIFile,
+        fileName: service.schemaPath,
       },
-      version
-    );
+    ];
+
+    for (const specFile of specFiles) {
+      await addFileToService(
+        service.id,
+        {
+          fileName: specFile.fileName,
+          content: specFile.content,
+        },
+        version
+      );
+    }
 
     console.log(chalk.cyan(` - Service (v${version}) created`));
   }

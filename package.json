@@ -35,9 +35,10 @@
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
     "@changesets/cli": "^2.27.7",
-    "@eventcatalog/sdk": "^0.1.1",
+    "@eventcatalog/sdk": "^0.1.3",
     "chalk": "^4",
     "openapi-types": "^12.1.3",
     "slugify": "^1.6.6"
-  }
+  },
+  "packageManager": "pnpm@7.33.6+sha512.90e27fd38047f18583f3342f784cc3f187f4d4caac89ebc1fffae18dcd7b2dde7678a0bf237481bcb8f7e8e66135fa34803856e4eb2c442ce082ffab5d9d241f"
 }
