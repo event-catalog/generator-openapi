@@ -11,11 +11,13 @@ import { Domain, Service } from './types';
 import { getMessageTypeUtils } from './utils/catalog-shorthand';
 import { OpenAPI } from 'openapi-types';
 import checkLicense from './utils/checkLicense';
+import yaml from 'js-yaml';
 
 type Props = {
   services: Service[];
   domain?: Domain;
   debug?: boolean;
+  saveParsedSpecFile?: boolean;
 };
 
 const validateOptions = (options: Props) => {
@@ -48,7 +50,7 @@ export default async (_: any, options: Props) => {
     getSpecificationFilesForService,
   } = utils(process.env.PROJECT_DIR);
 
-  const services = options.services ?? [];
+  const { services = [], saveParsedSpecFile = false } = options;
   validateOptions(options);
   for (const serviceSpec of services) {
     console.log(chalk.green(`Processing ${serviceSpec.path}`));
@@ -61,7 +63,6 @@ export default async (_: any, options: Props) => {
       continue;
     }
 
-    const openAPIFile = await readFile(serviceSpec.path, 'utf-8');
     const document = await SwaggerParser.parse(serviceSpec.path);
     const version = document.info.version;
 
@@ -151,7 +152,7 @@ export default async (_: any, options: Props) => {
       // add any previous spec files to the list
       ...serviceSpecificationsFiles,
       {
-        content: openAPIFile,
+        content: saveParsedSpecFile ? getParsedSpecFile(serviceSpec, document) : await getRawSpecFile(serviceSpec),
         fileName: service.schemaPath,
       },
     ];
@@ -248,3 +249,11 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
   }
   return { receives, sends: [] };
 };
+
+const getParsedSpecFile = (service: Service, document: OpenAPI.Document) => {
+  const isSpecFileJSON = service.path.endsWith('.json');
+  return isSpecFileJSON ? JSON.stringify(document, null, 4) : yaml.dump(document, { noRefs: true });
+};
+
+const getRawSpecFile = async (service: Service) => await readFile(service.path, 'utf8');
+
