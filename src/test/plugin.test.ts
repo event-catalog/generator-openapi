@@ -276,6 +276,48 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(schema).toBeDefined();
       });
 
+      it('the original openapi file is added to the service by default instead of parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
+      it('the original openapi file is added to the service instead of parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
+          saveParsedSpecFile: false,
+        });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
+      it('the original openapi file is not added but the parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
+          saveParsedSpecFile: true,
+        });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
       it('the openapi file is added to the specifications list in eventcatalog', async () => {
         const { getService, writeService } = utils(catalogDir);
 
