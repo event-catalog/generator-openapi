@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 2.1.0
+
+### Minor Changes
+
+- d7ed60c: chore(plugin): fixed issues with windows OS
+
 ## 2.0.1
 
 ### Patch Changes
