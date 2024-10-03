@@ -1,6 +1,7 @@
 import { OpenAPI } from 'openapi-types';
 import slugify from 'slugify';
 import { Service } from '../types';
+import path from 'path';
 
 export const defaultMarkdown = (document: OpenAPI.Document, fileName: string) => {
   return `
@@ -28,7 +29,7 @@ export const getSummary = (document: OpenAPI.Document) => {
 };
 
 export const buildService = (serviceOptions: Service, document: OpenAPI.Document) => {
-  const schemaPath = serviceOptions.path.split('/').pop() || 'openapi.yml';
+  const schemaPath = path.basename(serviceOptions.path) || 'openapi.yml';
   const documentTags = document.tags || [];
   const serviceId = serviceOptions.id || slugify(document.info.title, { lower: true, strict: true });
   return {
