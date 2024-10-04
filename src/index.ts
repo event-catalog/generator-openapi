@@ -140,8 +140,8 @@ export default async (_: any, options: Props) => {
         ...service,
         markdown: serviceMarkdown,
         specifications: serviceSpecifications,
-        sends: uniqueMessages(sends),
-        receives: uniqueMessages(receives),
+        sends,
+        receives,
       },
       { path: service.id }
     );
@@ -247,17 +247,4 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     }
   }
   return { receives, sends: [] };
-};
-
-const uniqueMessages = (messages: { id: string; version: string }[]): { id: string; version: string }[] => {
-  const uniqueSet = new Set();
-
-  return messages.filter((message) => {
-    const key = `${message.id}-${message.version}`;
-    if (!uniqueSet.has(key)) {
-      uniqueSet.add(key);
-      return true;
-    }
-    return false;
-  });
 };

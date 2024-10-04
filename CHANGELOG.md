@@ -1,5 +1,17 @@
 # @eventcatalog/generator-openapi
 
+## 2.1.1
+
+### Patch Changes
+
+- 6fb2a83: chore(plugin): removed code to set unique messages as sdk now does this
+
+## 2.1.0
+
+### Minor Changes
+
+- d7ed60c: chore(plugin): fixed issues with windows OS
+
 ## 2.0.1
 
 ### Patch Changes
