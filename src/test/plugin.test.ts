@@ -276,6 +276,48 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(schema).toBeDefined();
       });
 
+      it('the original openapi file is added to the service by default instead of parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
+      it('the original openapi file is added to the service instead of parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
+          saveParsedSpecFile: false,
+        });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
+      it('the original openapi file is not added but the parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
+          saveParsedSpecFile: true,
+        });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
       it('the openapi file is added to the specifications list in eventcatalog', async () => {
         const { getService, writeService } = utils(catalogDir);
 
@@ -509,6 +551,33 @@ describe('OpenAPI EventCatalog Plugin', () => {
             const service = await getService('my-custom-service-name', '1.0.0');
 
             expect(service).toBeDefined();
+          });
+
+          it('[id] if the `id` not provided in the service config options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                services: [
+                  {
+                    path: join(openAPIExamples, 'petstore.yml'),
+                  } as any,
+                ],
+              })
+            ).rejects.toThrow('The service id is required');
+          });
+          it('[services] if the `services` not provided in options, The generator throw an explicit error', async () => {
+            await expect(plugin(config, {} as any)).rejects.toThrow('Please provide correct services configuration');
+          });
+          it('[path] if the `path` not provided in service config options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                services: [
+                  {
+                    name: 'Awesome account service',
+                    id: 'awsome-service',
+                  } as any,
+                ],
+              })
+            ).rejects.toThrow('The service path is required. please provide the path to specification file');
           });
         });
       });
