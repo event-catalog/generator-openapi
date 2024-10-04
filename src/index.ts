@@ -18,6 +18,18 @@ type Props = {
   debug?: boolean;
 };
 
+const validateOptions = (options: Props) => {
+  if (!options.services) {
+    throw new Error('Please provide correct services configuration');
+  }
+  if (options.services.some((service) => !service.id)) {
+    throw new Error('The service id is required. please provide a service id');
+  }
+  if (options.services.some((service) => !service.path)) {
+    throw new Error('The service path is required. please provide the path to specification file');
+  }
+};
+
 export default async (_: any, options: Props) => {
   if (!process.env.PROJECT_DIR) {
     throw new Error('Please provide catalog url (env variable PROJECT_DIR)');
@@ -37,6 +49,7 @@ export default async (_: any, options: Props) => {
   } = utils(process.env.PROJECT_DIR);
 
   const services = options.services ?? [];
+  validateOptions(options);
   for (const serviceSpec of services) {
     console.log(chalk.green(`Processing ${serviceSpec.path}`));
 

@@ -510,6 +510,33 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
             expect(service).toBeDefined();
           });
+
+          it('[id] if the `id` not provided in the service config options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                services: [
+                  {
+                    path: join(openAPIExamples, 'petstore.yml'),
+                  } as any,
+                ],
+              })
+            ).rejects.toThrow('The service id is required');
+          });
+          it('[services] if the `services` not provided in options, The generator throw an explicit error', async () => {
+            await expect(plugin(config, {} as any)).rejects.toThrow('Please provide correct services configuration');
+          });
+          it('[path] if the `path` not provided in service config options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                services: [
+                  {
+                    name: 'Awesome account service',
+                    id: 'awsome-service',
+                  } as any,
+                ],
+              })
+            ).rejects.toThrow('The service path is required. please provide the path to specification file');
+          });
         });
       });
     });
