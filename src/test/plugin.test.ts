@@ -276,6 +276,48 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(schema).toBeDefined();
       });
 
+      it('the original openapi file is added to the service by default instead of parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
+      it('the original openapi file is added to the service instead of parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
+          saveParsedSpecFile: false,
+        });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
+      it('the original openapi file is not added but the parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
+          saveParsedSpecFile: true,
+        });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
       it('the openapi file is added to the specifications list in eventcatalog', async () => {
         const { getService, writeService } = utils(catalogDir);
 
@@ -509,6 +551,77 @@ describe('OpenAPI EventCatalog Plugin', () => {
             const service = await getService('my-custom-service-name', '1.0.0');
 
             expect(service).toBeDefined();
+          });
+
+          it('[id] if the `id` not provided in the service config options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                services: [
+                  {
+                    path: join(openAPIExamples, 'petstore.yml'),
+                  } as any,
+                ],
+              })
+            ).rejects.toThrow('The service id is required');
+          });
+          it('[services] if the `services` not provided in options, The generator throw an explicit error', async () => {
+            await expect(plugin(config, {} as any)).rejects.toThrow('Please provide correct services configuration');
+          });
+          it('[services] if the `services` is undefiend in options, The generator throw an explicit error', async () => {
+            await expect(plugin(config, { services: undefined } as any)).rejects.toThrow(
+              'Please provide correct services configuration'
+            );
+          });
+          it('[services::path] if the `services::path` not provided in options, The generator throw an explicit error', async () => {
+            await expect(plugin(config, { services: [{ id: 'service_id' }] } as any)).rejects.toThrow(
+              'The service path is required. please provide the path to specification file'
+            );
+          });
+          it('[services::id] if the `services::id` not provided in options, The generator throw an explicit error', async () => {
+            await expect(plugin(config, { services: [{ path: 'path/to/spec' }] } as any)).rejects.toThrow(
+              'The service id is required. please provide the service id'
+            );
+          });
+          it('[path] if the `path` not provided in service config options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                services: [
+                  {
+                    name: 'Awesome account service',
+                    id: 'awsome-service',
+                  } as any,
+                ],
+              })
+            ).rejects.toThrow('The service path is required. please provide the path to specification file');
+          });
+          it('[services::saveParsedSpecFile] if the `services::saveParsedSpecFile` not a boolean in options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, { services: [{ path: 'path/to/spec', id: 'sevice_id' }], saveParsedSpecFile: 'true' } as any)
+            ).rejects.toThrow('The saveParsedSpecFile is not a boolean in options');
+          });
+          it('[domain::id] if the `domain::id` not provided in options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                domain: { name: 'domain_name', version: '1.0.0' },
+                services: [{ path: 'path/to/spec', id: 'sevice_id' }],
+              } as any)
+            ).rejects.toThrow('The domain id is required. please provide a domain id');
+          });
+          it('[domain::name] if the `domain::name` not provided in options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                domain: { id: 'domain_name', version: '1.0.0' },
+                services: [{ path: 'path/to/spec', id: 'sevice_id' }],
+              } as any)
+            ).rejects.toThrow('The domain name is required. please provide a domain name');
+          });
+          it('[domain::version] if the `domain::version` not provided in options, The generator throw an explicit error', async () => {
+            await expect(
+              plugin(config, {
+                domain: { id: 'domain_name', name: 'domain_name' },
+                services: [{ path: 'path/to/spec', id: 'sevice_id' }],
+              } as any)
+            ).rejects.toThrow('The domain version is required. please provide a domain version');
           });
         });
       });
