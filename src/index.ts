@@ -7,31 +7,42 @@ import { defaultMarkdown as generateMarkdownForDomain } from './utils/domains';
 import { buildService } from './utils/services';
 import { buildMessage } from './utils/messages';
 import { getOperationsByType } from './utils/openapi';
-import { Domain, Service } from './types';
+import { Service } from './types';
 import { getMessageTypeUtils } from './utils/catalog-shorthand';
 import { OpenAPI } from 'openapi-types';
 import checkLicense from './utils/checkLicense';
 import yaml from 'js-yaml';
+import { z } from 'zod';
 
-type Props = {
-  services: Service[];
-  domain?: Domain;
-  debug?: boolean;
-  saveParsedSpecFile?: boolean;
-};
+const optionsSchema = z.object({
+  services: z.array(
+    z.object({
+      id: z.string({ required_error: 'The service id is required. please provide the service id' }),
+      path: z.string({ required_error: 'The service path is required. please provide the path to specification file' }),
+      name: z.string().optional(),
+    }),
+    { message: 'Please provide correct services configuration' }
+  ),
+  domain: z
+    .object({
+      id: z.string({ required_error: 'The domain id is required. please provide a domain id' }),
+      name: z.string({ required_error: 'The domain name is required. please provide a domain name' }),
+      version: z.string({ required_error: 'The domain version is required. please provide a domain version' }),
+    })
+    .optional(),
+  debug: z.boolean().optional(),
+  saveParsedSpecFile: z.boolean({ invalid_type_error: 'The saveParsedSpecFile is not a boolean in options' }).optional(),
+});
+
+type Props = z.infer<typeof optionsSchema>;
 
 const validateOptions = (options: Props) => {
-  if (!options.services) {
-    throw new Error('Please provide correct services configuration');
-  }
-  if (options.services.some((service) => !service.id)) {
-    throw new Error('The service id is required. please provide a service id');
-  }
-  if (options.services.some((service) => !service.path)) {
-    throw new Error('The service path is required. please provide the path to specification file');
+  try {
+    optionsSchema.parse(options);
+  } catch (error: any) {
+    if (error instanceof z.ZodError) throw new Error(JSON.stringify(error.issues, null, 2));
   }
 };
-
 export default async (_: any, options: Props) => {
   if (!process.env.PROJECT_DIR) {
     throw new Error('Please provide catalog url (env variable PROJECT_DIR)');
@@ -256,16 +267,3 @@ const getParsedSpecFile = (service: Service, document: OpenAPI.Document) => {
 };
 
 const getRawSpecFile = async (service: Service) => await readFile(service.path, 'utf8');
-
-const uniqueMessages = (messages: { id: string; version: string }[]): { id: string; version: string }[] => {
-  const uniqueSet = new Set();
-
-  return messages.filter((message) => {
-    const key = `${message.id}-${message.version}`;
-    if (!uniqueSet.has(key)) {
-      uniqueSet.add(key);
-      return true;
-    }
-    return false;
-  });
-};
