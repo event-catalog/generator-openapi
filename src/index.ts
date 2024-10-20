@@ -7,17 +7,40 @@ import { defaultMarkdown as generateMarkdownForDomain } from './utils/domains';
 import { buildService } from './utils/services';
 import { buildMessage } from './utils/messages';
 import { getOperationsByType } from './utils/openapi';
-import { Domain, Service } from './types';
 import { getMessageTypeUtils } from './utils/catalog-shorthand';
 import { OpenAPI } from 'openapi-types';
 import checkLicense from './utils/checkLicense';
+import { z } from 'zod';
 
-type Props = {
-  services: Service[];
-  domain?: Domain;
-  debug?: boolean;
+const optionsSchema = z.object({
+  services: z.array(
+    z.object({
+      id: z.string({ required_error: 'The service id is required. please provide the service id' }),
+      path: z.string({ required_error: 'The service path is required. please provide the path to specification file' }),
+      name: z.string().optional(),
+    }),
+    { message: 'Please provide correct services configuration' }
+  ),
+  domain: z
+    .object({
+      id: z.string({ required_error: 'The domain id is required. please provide a domain id' }),
+      name: z.string({ required_error: 'The domain name is required. please provide a domain name' }),
+      version: z.string({ required_error: 'The domain version is required. please provide a domain version' }),
+    })
+    .optional(),
+  debug: z.boolean().optional(),
+  saveParsedSpecFile: z.boolean({ invalid_type_error: 'The saveParsedSpecFile is not a boolean in options' }).optional(),
+});
+
+type Props = z.infer<typeof optionsSchema>;
+
+const validateOptions = (options: Props) => {
+  try {
+    optionsSchema.parse(options);
+  } catch (error: any) {
+    if (error instanceof z.ZodError) throw new Error(JSON.stringify(error.issues, null, 2));
+  }
 };
-
 export default async (_: any, options: Props) => {
   if (!process.env.PROJECT_DIR) {
     throw new Error('Please provide catalog url (env variable PROJECT_DIR)');
@@ -37,6 +60,7 @@ export default async (_: any, options: Props) => {
   } = utils(process.env.PROJECT_DIR);
 
   const services = options.services ?? [];
+  validateOptions(options);
   for (const serviceSpec of services) {
     console.log(chalk.green(`Processing ${serviceSpec.path}`));
 
