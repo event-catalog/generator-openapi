@@ -1,0 +1,123 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Test Service",
+    "version": "1.1.0"
+  },
+  "paths": {
+    "/signup": {
+      "post": {
+        "operationId": "usersignup",
+        "summary": "List all users",
+        "description": "Returns a list of all users.\nThis operation is **deprecated**.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "imageUrl": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "name", "price", "category"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "price": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "category": {
+                        "type": "string"
+                      },
+                      "imageUrl": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "name", "price", "category"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserSignup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "category": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "name", "price", "category"]
+      },
+      "Date": {
+        "type": "string",
+        "format": "date"
+      },
+      "DateWithExample": {
+        "description": "Date schema extended with a `default` value... Or not?",
+        "default": "2000-01-01T00:00:00.000Z",
+        "type": "string",
+        "format": "date"
+      }
+    }
+  }
+}
