@@ -303,7 +303,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(schema).toBeDefined();
       });
 
-      it('the original openapi file is not added but the parsed version', async () => {
+      it('when savedParsedSpecFile is true, the openapi is parsed and refs are resolved', async () => {
         const { getService } = utils(catalogDir);
         await plugin(config, {
           services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
