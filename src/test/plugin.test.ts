@@ -773,7 +773,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(normalizeLineEndings(asyncAPIFile)).toEqual(normalizeLineEndings(expected));
       });
 
-      it('OpenApi files with $ref are resolved and added to the catalog', async () => {
+      it('when savedParsedSpecFile is set, the OpenAPI files with $ref are resolved and added to the catalog', async () => {
         const { getService, getCommand } = utils(catalogDir);
 
         await plugin(config, {
