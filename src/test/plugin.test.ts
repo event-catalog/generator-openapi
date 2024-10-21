@@ -742,7 +742,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
     });
 
     describe('$ref', () => {
-      it('OpenApi files with $ref are resolved and added to the catalog', async () => {
+      it('when saveParsedSpecFile is set, the OpenAPI files with $ref are resolved and added to the catalog', async () => {
         const { getService, getCommand } = utils(catalogDir);
 
         await plugin(config, {
