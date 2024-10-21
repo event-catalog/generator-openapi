@@ -276,6 +276,48 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(schema).toBeDefined();
       });
 
+      it('the original openapi file is added to the service by default instead of parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
+      it('the original openapi file is added to the service instead of parsed version', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
+          saveParsedSpecFile: false,
+        });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
+      it('when savedParsedSpecFile is true, the openapi is parsed and refs are resolved', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
+          saveParsedSpecFile: true,
+        });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+
+        expect(service.schemaPath).toEqual('petstore.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'), 'utf8');
+        expect(schema).toBeDefined();
+      });
+
       it('the openapi file is added to the specifications list in eventcatalog', async () => {
         const { getService, writeService } = utils(catalogDir);
 
@@ -696,6 +738,70 @@ describe('OpenAPI EventCatalog Plugin', () => {
           expect(command.markdown).toContain(`### Parameters
 - **limit** (query): How many items to return at one time (max 100)`);
         });
+      });
+    });
+
+    describe('$ref', () => {
+      it('when saveParsedSpecFile is set, the OpenAPI files with $ref are resolved and added to the catalog', async () => {
+        const { getService, getCommand } = utils(catalogDir);
+
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'ref-example.yml'), id: 'test-service' }],
+          saveParsedSpecFile: true,
+        });
+
+        const service = await getService('test-service', '1.1.0');
+        const event = await getCommand('usersignup', '1.1.0');
+
+        expect(service).toBeDefined();
+        expect(event).toBeDefined();
+        expect(event.schemaPath).toEqual('request-body.json');
+      });
+
+      it('when saveParsedSpecFile is set, the OpenApi saved to the service $ref values are resolved', async () => {
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'ref-example.yml'), id: 'Test Service' }],
+          saveParsedSpecFile: true,
+        });
+
+        const asyncAPIFile = (await fs.readFile(join(catalogDir, 'services', 'Test Service', 'ref-example.yml'))).toString();
+        const expected = (await fs.readFile(join(openAPIExamples, 'ref-example-with-resolved-refs.yml'))).toString();
+
+        // Normalize line endings
+        const normalizeLineEndings = (str: string) => str.replace(/\r\n/g, '\n');
+
+        expect(normalizeLineEndings(asyncAPIFile)).toEqual(normalizeLineEndings(expected));
+      });
+
+      it('when savedParsedSpecFile is set, the OpenAPI files with $ref are resolved and added to the catalog', async () => {
+        const { getService, getCommand } = utils(catalogDir);
+
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'ref-example.json'), id: 'test-service' }],
+          saveParsedSpecFile: true,
+        });
+
+        const service = await getService('test-service', '1.1.0');
+        const event = await getCommand('usersignup', '1.1.0');
+
+        expect(service).toBeDefined();
+        expect(event).toBeDefined();
+        expect(event.schemaPath).toEqual('request-body.json');
+      });
+
+      it('when savedParsedSpecFile is set, the OpenApi has any $ref these are not saved to the service. The servive AsyncAPI is has no $ref', async () => {
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'ref-example.json'), id: 'Test Service' }],
+          saveParsedSpecFile: true,
+        });
+
+        const asyncAPIFile = (await fs.readFile(join(catalogDir, 'services', 'Test Service', 'ref-example.json'))).toString();
+        const expected = (await fs.readFile(join(openAPIExamples, 'ref-example-with-resolved-refs.json'))).toString();
+
+        // Normalize line endings
+        const normalizeLineEndings = (str: string) => str.replace(' ', '').replace(/\r\n/g, '\n').replace(/\s+/g, '');
+
+        expect(normalizeLineEndings(asyncAPIFile)).toEqual(normalizeLineEndings(expected));
       });
     });
   });

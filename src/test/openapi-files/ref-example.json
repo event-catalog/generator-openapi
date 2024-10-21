@@ -1,0 +1,56 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Test Service",
+    "version": "1.1.0"
+  },
+  "paths": {
+    "/signup": {
+      "post": {
+        "operationId": "usersignup",
+        "summary": "List all users",
+        "description": "Returns a list of all users.\nThis operation is **deprecated**.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSignup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserSignup"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserSignup": {
+        "$ref": "ref-example-signup-message.yml"
+      },
+      "Date": {
+        "type": "string",
+        "format": "date"
+      },
+      "DateWithExample": {
+        "$ref": "#/components/schemas/Date",
+        "description": "Date schema extended with a `default` value... Or not?",
+        "default": "2000-01-01T00:00:00.000Z"
+      }
+    }
+  }
+}
