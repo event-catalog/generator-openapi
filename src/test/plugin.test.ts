@@ -758,7 +758,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(event.schemaPath).toEqual('request-body.json');
       });
 
-      it('if the OpenApi has any $ref these are not saved to the service. The servive AsyncAPI is has no $ref', async () => {
+      it('when saveParsedSpecFile is set, the OpenApi saved to the service $ref values are resolved', async () => {
         await plugin(config, {
           services: [{ path: join(openAPIExamples, 'ref-example.yml'), id: 'Test Service' }],
           saveParsedSpecFile: true,
