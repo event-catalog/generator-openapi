@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 2.1.2
+
+### Patch Changes
+
+- cade528: feat(plugin): added ability to resolve $ref values when saving OpenAPI files to the catalog
+
 ## 2.1.1
 
 ### Patch Changes
