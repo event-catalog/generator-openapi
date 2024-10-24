@@ -303,7 +303,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(schema).toBeDefined();
       });
 
-      it('when savedParsedSpecFile is true, the openapi is parsed and refs are resolved', async () => {
+      it('when saveParsedSpecFile is true, the openapi is parsed and refs are resolved', async () => {
         const { getService } = utils(catalogDir);
         await plugin(config, {
           services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }],
@@ -773,7 +773,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(normalizeLineEndings(asyncAPIFile)).toEqual(normalizeLineEndings(expected));
       });
 
-      it('when savedParsedSpecFile is set, the OpenAPI files with $ref are resolved and added to the catalog', async () => {
+      it('when saveParsedSpecFile is set, the OpenAPI files with $ref are resolved and added to the catalog', async () => {
         const { getService, getCommand } = utils(catalogDir);
 
         await plugin(config, {
@@ -789,7 +789,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(event.schemaPath).toEqual('request-body.json');
       });
 
-      it('when savedParsedSpecFile is set, the OpenApi has any $ref these are not saved to the service. The servive AsyncAPI is has no $ref', async () => {
+      it('when saveParsedSpecFile is set, the OpenApi has any $ref these are not saved to the service. The servive AsyncAPI is has no $ref', async () => {
         await plugin(config, {
           services: [{ path: join(openAPIExamples, 'ref-example.json'), id: 'Test Service' }],
           saveParsedSpecFile: true,
