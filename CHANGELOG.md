@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 2.2.0
+
+### Minor Changes
+
+- 3de119a: chore(plugin): updated eventcatalog sdk version
+
 ## 2.1.2
 
 ### Patch Changes
