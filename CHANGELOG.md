@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 2.3.0
+
+### Minor Changes
+
+- 7820a6f: feat(plugin): added new optional extention x-eventcatalog-message-action
+
 ## 2.2.0
 
 ### Minor Changes
