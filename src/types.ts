@@ -18,6 +18,7 @@ export type Operation = {
   summary?: string;
   description?: string;
   type: string;
+  action: string;
   externalDocs?: OpenAPIV3_1.ExternalDocumentationObject;
   tags: string[];
 };

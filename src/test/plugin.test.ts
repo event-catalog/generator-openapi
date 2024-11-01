@@ -578,38 +578,51 @@ describe('OpenAPI EventCatalog Plugin', () => {
         );
       });
 
-      it('messages marked as "events" using the custom `x-ec-message-type` header in an OpenAPI are documented in EventCatalog as events ', async () => {
-        const { getEvent } = utils(catalogDir);
+      describe('OpenAPI eventcatalog extensions', () => {
+        it('messages marked as "events" using the custom `x-eventcatalog-message-type` header in an OpenAPI are documented in EventCatalog as events ', async () => {
+          const { getEvent } = utils(catalogDir);
 
-        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+          await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
 
-        const event = await getEvent('petAdopted');
+          const event = await getEvent('petAdopted');
 
-        expect(event).toEqual(
-          expect.objectContaining({
-            id: 'petAdopted',
-            name: 'petAdopted',
-            version: '1.0.0',
-            summary: 'Notify that a pet has been adopted',
-          })
-        );
-      });
+          expect(event).toEqual(
+            expect.objectContaining({
+              id: 'petAdopted',
+              name: 'petAdopted',
+              version: '1.0.0',
+              summary: 'Notify that a pet has been adopted',
+            })
+          );
+        });
 
-      it('messages marked as "commands" using the custom `x-ec-message-type` header in an OpenAPI are documented in EventCatalog as commands ', async () => {
-        const { getCommand } = utils(catalogDir);
+        it('messages marked as "commands" using the custom `x-eventcatalog-message-type` header in an OpenAPI are documented in EventCatalog as commands ', async () => {
+          const { getCommand } = utils(catalogDir);
 
-        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+          await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
 
-        const event = await getCommand('createPets');
+          const event = await getCommand('createPets');
 
-        expect(event).toEqual(
-          expect.objectContaining({
-            id: 'createPets',
-            name: 'createPets',
-            version: '1.0.0',
-            summary: 'Create a pet',
-          })
-        );
+          expect(event).toEqual(
+            expect.objectContaining({
+              id: 'createPets',
+              name: 'createPets',
+              version: '1.0.0',
+              summary: 'Create a pet',
+            })
+          );
+        });
+
+        it('messages marked as "sends" using the custom `x-eventcatalog-message-action` header in an OpenAPI are mapped against the service as messages the service sends ', async () => {
+          const { getService } = utils(catalogDir);
+
+          await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+          const service = await getService('swagger-petstore');
+
+          expect(service.sends).toHaveLength(1);
+          expect(service.sends).toEqual([{ id: 'petVaccinated', version: '1.0.0' }]);
+        });
       });
 
       it('when the message already exists in EventCatalog but the versions do not match, the existing message is versioned', async () => {

@@ -121,6 +121,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /pets/{petId}/vaccinated:
+    post:
+      summary: Notify that a pet has been vaccinated
+      operationId: petVaccinated
+      tags:
+        - pets
+      x-eventcatalog-message-action: sends # This is a sends operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vaccination'
+        required: true
+      responses:
+        '200':
+          description: Notification that the pet has been vaccinated successfully
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Pet:
@@ -153,6 +175,18 @@ components:
         adopterName:
           type: string
           description: Name of the person who adopted the pet
+    Vaccination:
+      type: object
+      required:
+        - petId
+        - vaccine
+      properties:
+        petId:
+          type: integer
+          format: int64
+        vaccine:
+          type: string
+          description: Name of the vaccine administered
     Error:
       type: object
       required:
