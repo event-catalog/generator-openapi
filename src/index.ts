@@ -164,13 +164,15 @@ export default async (_: any, options: Props) => {
 const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenAPI.Document) => {
   const operations = await getOperationsByType(pathToSpec);
   const version = document.info.version;
-  let receives = [];
+  let receives = [],
+    sends = [];
 
   // Go through all messages
   for (const operation of operations) {
     const { requestBodiesAndResponses, ...message } = await buildMessage(pathToSpec, document, operation);
     let messageMarkdown = message.markdown;
     const messageType = operation.type;
+    const messageAction = operation.action;
 
     console.log(chalk.blue(`Processing message: ${message.name} (v${version})`));
 
@@ -197,11 +199,18 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     // Write the message to the catalog
     await writeMessage({ ...message, markdown: messageMarkdown }, { path: message.name });
 
-    // messages will always be messages the service receives
-    receives.push({
-      id: message.id,
-      version: message.version,
-    });
+    // If the message send or recieved by the service?
+    if (messageAction === 'sends') {
+      sends.push({
+        id: message.id,
+        version: message.version,
+      });
+    } else {
+      receives.push({
+        id: message.id,
+        version: message.version,
+      });
+    }
 
     // Does the message have a request body or responses?
     if (requestBodiesAndResponses?.requestBody) {
@@ -234,7 +243,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
       console.log(chalk.yellow(`  - Use operationIds to give better unique names for EventCatalog`));
     }
   }
-  return { receives, sends: [] };
+  return { receives, sends };
 };
 
 const getParsedSpecFile = (service: Service, document: OpenAPI.Document) => {
