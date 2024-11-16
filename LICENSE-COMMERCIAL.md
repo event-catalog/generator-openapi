@@ -16,4 +16,4 @@ You will need a Commercial License in the following cases:
 - You are building proprietary software or SaaS platforms where you do not want to share the source code with customers or the public.
 - You are creating a closed-source product that incorporates this software.
 
-If you would like to obtain a Commercial License or have any questions, please contact us at **hello@eventcatalog.dev**.
+If you would like to obtain a Commercial License, you can purchase a license at https://dashboard.eventcatalog.dev or email us at `hello@eventcatalog.dev`

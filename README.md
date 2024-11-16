@@ -116,7 +116,6 @@ Thank you to our project sponsors.
 
 <hr />
 
-
 _Sponsors help make EventCatalog sustainable, want to help the project? Get in touch! Or [visit our sponsor page](https://www.eventcatalog.dev/support)._
 
 # Enterprise support
@@ -151,4 +150,4 @@ You can find the [contributing guidelines here](https://eventcatalog.dev/docs/co
 
 This project is governed by a [dual-license](./LICENSE.md). To ensure the sustainability of the project, you can freely make use of this software if your projects are Open Source. Otherwise for internal systems you must obtain a [commercial license](./LICENSE-COMMERCIAL.md).
 
-To obtain a commercial license or have any questions you can email us at `hello@eventcatalog.dev`.
+If you would like to obtain a Commercial License, you can purchase a license at https://dashboard.eventcatalog.dev or email us at `hello@eventcatalog.dev`
