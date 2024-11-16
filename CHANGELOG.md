@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 2.3.1
+
+### Patch Changes
+
+- 31f193f: chore(plugin):added dashboard link to generator
+
 ## 2.3.0
 
 ### Minor Changes
