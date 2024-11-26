@@ -77,6 +77,12 @@ export async function getOperationsByType(openApiPath: string) {
         // Check if the x-eventcatalog-message-type field is set
         const messageType = openAPIOperation['x-eventcatalog-message-type'] || DEFAULT_MESSAGE_TYPE;
         const messageAction = openAPIOperation['x-eventcatalog-message-action'] === 'sends' ? 'sends' : 'receives';
+        const extensions = Object.keys(openAPIOperation).reduce((acc: { [key: string]: any }, key) => {
+          if (key.startsWith('x-eventcatalog-')) {
+            acc[key] = openAPIOperation[key];
+          }
+          return acc;
+        }, {});
 
         const operation = {
           path: path,
@@ -88,6 +94,7 @@ export async function getOperationsByType(openApiPath: string) {
           description: openAPIOperation.description,
           summary: openAPIOperation.summary,
           tags: openAPIOperation.tags || [],
+          extensions,
         } as Operation;
 
         operations.push(operation);

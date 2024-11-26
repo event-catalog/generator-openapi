@@ -473,7 +473,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
         expect(service.receives).toHaveLength(4);
         expect(service.receives).toEqual([
-          { id: 'listPets', version: '1.0.0' },
+          { id: 'list-pets', version: '1.0.0' },
           { id: 'createPets', version: '1.0.0' },
           { id: 'showPetById', version: '1.0.0' },
           { id: 'petAdopted', version: '1.0.0' },
@@ -501,7 +501,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(service.receives).toHaveLength(5);
         expect(service.receives).toEqual([
           { id: 'userloggedin', version: '1.0.0' },
-          { id: 'listPets', version: '1.0.0' },
+          { id: 'list-pets', version: '1.0.0' },
           { id: 'createPets', version: '1.0.0' },
           { id: 'showPetById', version: '1.0.0' },
           { id: 'petAdopted', version: '1.0.0' },
@@ -519,7 +519,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
             name: 'Random Name',
             markdown: 'Here is my original markdown, please do not override this!',
             receives: [
-              { id: 'listPets', version: '1.0.0' },
+              { id: 'list-pets', version: '1.0.0' },
               { id: 'createPets', version: '1.0.0' },
             ],
           },
@@ -532,7 +532,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(service.receives).toHaveLength(4);
 
         expect(service.receives).toEqual([
-          { id: 'listPets', version: '1.0.0' },
+          { id: 'list-pets', version: '1.0.0' },
           { id: 'createPets', version: '1.0.0' },
           { id: 'showPetById', version: '1.0.0' },
           { id: 'petAdopted', version: '1.0.0' },
@@ -562,16 +562,20 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
         await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
 
-        const command = await getQuery('listPets');
+        const command = await getQuery('list-pets');
 
-        const file = await fs.readFile(join(catalogDir, 'queries', 'listPets', 'index.md'));
+        const dir = await fs.readdir(join(catalogDir, 'queries'));
+
+        console.log(dir);
+
+        const file = await fs.readFile(join(catalogDir, 'queries', 'list-pets', 'index.md'));
         expect(file).toBeDefined();
 
         expect(command).toEqual(
           expect.objectContaining({
-            id: 'listPets',
+            id: 'list-pets',
             version: '1.0.0',
-            name: 'listPets',
+            name: 'List Pets',
             summary: 'List all pets',
             badges: [
               { content: 'GET', textColor: 'blue', backgroundColor: 'blue' },
@@ -642,6 +646,31 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
           expect(service.sends).toHaveLength(1);
           expect(service.sends).toEqual([{ id: 'petVaccinated', version: '1.0.0' }]);
+        });
+
+        it('when messages have the `x-eventcatalog-message-name` extension defined, this value is used for the message name', async () => {
+          const { getQuery } = utils(catalogDir);
+
+          await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+          const event = await getQuery('list-pets');
+
+          expect(event).toEqual(
+            expect.objectContaining({
+              id: 'list-pets',
+              name: 'List Pets',
+              version: '1.0.0',
+              summary: 'List all pets',
+            })
+          );
+        });
+        it('when messages have the `x-eventcatalog-message-id` extension defined, this value is used for the message id', async () => {
+          const { getQuery } = utils(catalogDir);
+
+          await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+          const event = await getQuery('list-pets');
+          expect(event.id).toEqual('list-pets');
         });
       });
 
@@ -766,7 +795,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
           await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
 
-          const command = await getCommand('listPets');
+          const command = await getCommand('list-pets');
 
           expect(command.markdown).toContain(`### Parameters
 - **limit** (query): How many items to return at one time (max 100)`);

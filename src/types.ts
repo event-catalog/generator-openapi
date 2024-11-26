@@ -21,6 +21,9 @@ export type Operation = {
   action: string;
   externalDocs?: OpenAPIV3_1.ExternalDocumentationObject;
   tags: string[];
+  extensions?: {
+    [key: string]: any;
+  };
 };
 
 export interface OpenAPIParameter {
