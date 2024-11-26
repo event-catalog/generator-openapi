@@ -22,6 +22,10 @@ type Props = {
 
 export default async (_: any, options: Props) => {
   if (!process.env.PROJECT_DIR) {
+    process.env.PROJECT_DIR = process.cwd();
+  }
+
+  if (!process.env.PROJECT_DIR) {
     throw new Error('Please provide catalog url (env variable PROJECT_DIR)');
   }
 
