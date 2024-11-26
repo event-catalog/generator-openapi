@@ -16,24 +16,36 @@ export const getMessageTypeUtils = (projectDirectory: string, messageType: strin
     addFileToCommand,
     addFileToEvent,
     versionEvent,
+    versionQuery,
+    getQuery,
+    rmQueryById,
+    writeQuery,
+    addFileToQuery,
   } = utils(projectDirectory);
 
-  if (messageType === 'event') {
-    return {
+  const messageTypeMap: { [key: string]: any } = {
+    event: {
       versionMessage: versionEvent,
       getMessage: getEvent,
       rmMessageById: rmEventById,
       writeMessage: writeEvent,
       addFileToMessage: addFileToEvent,
-    };
-  }
-
-  // default command
-  return {
-    versionMessage: versionCommand,
-    getMessage: getCommand,
-    rmMessageById: rmCommandById,
-    writeMessage: writeCommand,
-    addFileToMessage: addFileToCommand,
+    },
+    command: {
+      versionMessage: versionCommand,
+      getMessage: getCommand,
+      rmMessageById: rmCommandById,
+      writeMessage: writeCommand,
+      addFileToMessage: addFileToCommand,
+    },
+    query: {
+      versionMessage: versionQuery,
+      getMessage: getQuery,
+      rmMessageById: rmQueryById,
+      writeMessage: writeQuery,
+      addFileToMessage: addFileToQuery,
+    },
   };
+
+  return messageTypeMap[messageType] || messageTypeMap.query;
 };
