@@ -98,6 +98,7 @@ export const getSummary = (message: Operation) => {
 
 export const buildMessage = async (pathToFile: string, document: OpenAPI.Document, operation: Operation) => {
   const requestBodiesAndResponses = await getSchemasByOperationId(pathToFile, operation.operationId);
+  const extensions = operation.extensions || {};
 
   const operationTags = operation.tags.map((badge) => ({
     content: `tag:${badge}`,
@@ -116,9 +117,9 @@ export const buildMessage = async (pathToFile: string, document: OpenAPI.Documen
   }
 
   return {
-    id: uniqueIdentifier,
+    id: extensions['x-eventcatalog-message-id'] || uniqueIdentifier,
     version: document.info.version,
-    name: uniqueIdentifier,
+    name: extensions['x-eventcatalog-message-name'] || uniqueIdentifier,
     summary: getSummary(operation),
     markdown: defaultMarkdown(operation, requestBodiesAndResponses),
     schemaPath: requestBodiesAndResponses?.requestBody ? 'request-body.json' : '',

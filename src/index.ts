@@ -193,7 +193,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     }
 
     // Write the message to the catalog
-    await writeMessage({ ...message, markdown: messageMarkdown }, { path: message.name, override: true });
+    await writeMessage({ ...message, markdown: messageMarkdown }, { path: message.id, override: true });
 
     // If the message send or recieved by the service?
     if (messageAction === 'sends') {
