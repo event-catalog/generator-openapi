@@ -557,12 +557,15 @@ describe('OpenAPI EventCatalog Plugin', () => {
     });
 
     describe('messages', () => {
-      it('messages that do not have an eventcatalog header are documented as commands by default in EventCatalog', async () => {
-        const { getCommand } = utils(catalogDir);
+      it('messages that do not have an `x-eventcatalog-message-type` header defined are documented as queries by default in EventCatalog', async () => {
+        const { getQuery } = utils(catalogDir);
 
         await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
 
-        const command = await getCommand('listPets');
+        const command = await getQuery('listPets');
+
+        const file = await fs.readFile(join(catalogDir, 'queries', 'listPets', 'index.md'));
+        expect(file).toBeDefined();
 
         expect(command).toEqual(
           expect.objectContaining({
@@ -609,6 +612,23 @@ describe('OpenAPI EventCatalog Plugin', () => {
               name: 'createPets',
               version: '1.0.0',
               summary: 'Create a pet',
+            })
+          );
+        });
+
+        it('messages marked as "query" using the custom `x-eventcatalog-message-type` header in an OpenAPI are documented in EventCatalog as commands ', async () => {
+          const { getCommand } = utils(catalogDir);
+
+          await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+          const event = await getCommand('showPetById');
+
+          expect(event).toEqual(
+            expect.objectContaining({
+              id: 'showPetById',
+              name: 'showPetById',
+              version: '1.0.0',
+              summary: 'Info for a specific pet',
             })
           );
         });
