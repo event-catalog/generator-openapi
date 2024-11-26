@@ -1,5 +1,16 @@
 # @eventcatalog/generator-openapi
 
+## 3.0.0
+
+### Major Changes
+
+- 73edb5e: feat(core): added new extensions for name and id in openapi
+- 6a07de0: feat(plugin): all messages are now queries by default
+
+### Patch Changes
+
+- 1fd9adc: fix(core): added message description to markdown contents
+
 ## 2.3.1
 
 ### Patch Changes
