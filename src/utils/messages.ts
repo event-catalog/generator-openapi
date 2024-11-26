@@ -48,6 +48,15 @@ export const defaultMarkdown = (message: Operation, openAPIOperation: OpenAPIOpe
 <NodeGraph />
 
 ${
+  message.description
+    ? `
+## Overview
+${message.description}
+`
+    : ''
+}
+
+${
   message.externalDocs
     ? `
 ## External documentation

@@ -32,7 +32,6 @@ export default async (_: any, options: Props) => {
     addServiceToDomain,
     getService,
     versionService,
-    rmServiceById,
     writeService,
     addFileToService,
     getSpecificationFilesForService,
@@ -119,7 +118,6 @@ export default async (_: any, options: Props) => {
       // Match found, override it
       if (latestServiceInCatalog.version === version) {
         receives = latestServiceInCatalog.receives ? [...latestServiceInCatalog.receives, ...receives] : receives;
-        await rmServiceById(service.id);
       }
     }
 
@@ -131,7 +129,7 @@ export default async (_: any, options: Props) => {
         sends,
         receives,
       },
-      { path: service.id }
+      { path: service.id, override: true }
     );
 
     // What files need added to the service (speficiation files)
@@ -176,7 +174,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
 
     console.log(chalk.blue(`Processing message: ${message.name} (v${version})`));
 
-    const { addFileToMessage, writeMessage, rmMessageById, getMessage, versionMessage } = getMessageTypeUtils(
+    const { addFileToMessage, writeMessage, getMessage, versionMessage } = getMessageTypeUtils(
       process.env.PROJECT_DIR as string,
       messageType
     );
@@ -187,9 +185,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     if (catalogedMessage) {
       messageMarkdown = catalogedMessage.markdown;
       // if the version matches, we can override the message but keep markdown as it  was
-      if (catalogedMessage.version === version) {
-        await rmMessageById(message.id, version);
-      } else {
+      if (catalogedMessage.version !== version) {
         // if the version does not match, we need to version the message
         await versionMessage(message.id);
         console.log(chalk.cyan(` - Versioned previous message: (v${catalogedMessage.version})`));
@@ -197,7 +193,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     }
 
     // Write the message to the catalog
-    await writeMessage({ ...message, markdown: messageMarkdown }, { path: message.name });
+    await writeMessage({ ...message, markdown: messageMarkdown }, { path: message.name, override: true });
 
     // If the message send or recieved by the service?
     if (messageAction === 'sends') {
