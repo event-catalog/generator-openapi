@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 3.0.1
+
+### Patch Changes
+
+- 2b28973: fix(plugin): set default value for plugin DIR
+
 ## 3.0.0
 
 ### Major Changes
