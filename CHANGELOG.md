@@ -1,5 +1,15 @@
 # @eventcatalog/generator-openapi
 
+## 3.1.0
+
+### Minor Changes
+
+- bdbf298: feat(core): added ability to add files from remote urls
+
+### Patch Changes
+
+- f0a4149: fix(plugin): owner and repoistory are now persisted between versioning
+
 ## 3.0.1
 
 ### Patch Changes
