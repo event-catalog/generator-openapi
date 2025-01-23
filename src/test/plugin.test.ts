@@ -188,7 +188,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
         await writeService(
           {
-            id: 'swagger-petstore',
+            id: 'swagger-petstore-2',
             version: '1.0.0',
             name: 'Random Name',
             markdown: 'Here is my original markdown, please do not override this!',
@@ -196,12 +196,12 @@ describe('OpenAPI EventCatalog Plugin', () => {
           { path: 'Swagger Petstore' }
         );
 
-        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore-2' }] });
 
-        const service = await getService('swagger-petstore', '1.0.0');
+        const service = await getService('swagger-petstore-2', '1.0.0');
         expect(service).toEqual(
           expect.objectContaining({
-            id: 'swagger-petstore',
+            id: 'swagger-petstore-2',
             name: 'Swagger Petstore',
             version: '1.0.0',
             summary: 'This is a sample server Petstore server.',
@@ -521,11 +521,13 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
       it('all the endpoints in the OpenAPI spec are messages the service `receives`. If the version matches the latest the receives are persisted', async () => {
         // Create a service with the same name and version as the OpenAPI file for testing
+        //sleep
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const { writeService, getService } = utils(catalogDir);
 
         await writeService(
           {
-            id: 'swagger-petstore',
+            id: 'swagger-petstore-3',
             version: '1.0.0',
             name: 'Random Name',
             markdown: 'Here is my original markdown, please do not override this!',
@@ -534,9 +536,9 @@ describe('OpenAPI EventCatalog Plugin', () => {
           { path: 'Swagger Petstore' }
         );
 
-        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore-3' }] });
 
-        const service = await getService('swagger-petstore', '1.0.0');
+        const service = await getService('swagger-petstore-3', '1.0.0');
         expect(service.receives).toHaveLength(5);
         expect(service.receives).toEqual([
           { id: 'userloggedin', version: '1.0.0' },
@@ -553,7 +555,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
         await writeService(
           {
-            id: 'swagger-petstore',
+            id: 'swagger-petstore-5',
             version: '1.0.0',
             name: 'Random Name',
             markdown: 'Here is my original markdown, please do not override this!',
@@ -565,9 +567,9 @@ describe('OpenAPI EventCatalog Plugin', () => {
           { path: 'Swagger Petstore' }
         );
 
-        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore-5' }] });
 
-        const service = await getService('swagger-petstore', '1.0.0');
+        const service = await getService('swagger-petstore-5', '1.0.0');
         expect(service.receives).toHaveLength(4);
 
         expect(service.receives).toEqual([
