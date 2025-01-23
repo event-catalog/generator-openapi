@@ -136,7 +136,7 @@ export default async (_: any, options: Props) => {
       { path: service.id, override: true }
     );
 
-    // What files need added to the service (speficiation files)
+    // What files need added to the service (specification files)
     const specFiles = [
       // add any previous spec files to the list
       ...serviceSpecificationsFiles,
@@ -251,4 +251,13 @@ const getParsedSpecFile = (service: Service, document: OpenAPI.Document) => {
   return isSpecFileJSON ? JSON.stringify(document, null, 2) : yaml.dump(document, { noRefs: true });
 };
 
-const getRawSpecFile = async (service: Service) => await readFile(service.path, 'utf8');
+const getRawSpecFile = async (service: Service) => {
+  if (service.path.startsWith('http')) {
+    const file = await fetch(service.path, { method: 'GET' });
+    if (!file.ok) {
+      throw new Error(`Failed to fetch file: ${service.path}, status: ${file.status}`);
+    }
+    return await file.text();
+  }
+  return await readFile(service.path, 'utf8');
+};

@@ -3,6 +3,7 @@ import utils from '@eventcatalog/sdk';
 import plugin from '../index';
 import { join } from 'node:path';
 import fs from 'fs/promises';
+import { vi } from 'vitest';
 
 // Fake eventcatalog config
 const config = {};
@@ -273,6 +274,25 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(service.schemaPath).toEqual('petstore.yml');
 
         const schema = await fs.readFile(join(catalogDir, 'services', 'swagger-petstore', 'petstore.yml'));
+        expect(schema).toBeDefined();
+      });
+
+      it('if the openapi file is a URL, the file is downloaded and added to the service', async () => {
+        const { getService } = utils(catalogDir);
+        await plugin(config, {
+          services: [
+            {
+              path: 'https://raw.githubusercontent.com/event-catalog/generator-openapi/refs/heads/main/examples/petstore/openapi.yml',
+              id: 'cart-service',
+            },
+          ],
+        });
+
+        const service = await getService('cart-service', '3.0.0');
+
+        expect(service.schemaPath).toEqual('openapi.yml');
+
+        const schema = await fs.readFile(join(catalogDir, 'services', 'cart-service', 'openapi.yml'));
         expect(schema).toBeDefined();
       });
 
