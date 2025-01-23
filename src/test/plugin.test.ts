@@ -280,10 +280,12 @@ describe('OpenAPI EventCatalog Plugin', () => {
       it('if the openapi file is a URL, the file is downloaded and added to the service', async () => {
         const { getService } = utils(catalogDir);
         await plugin(config, {
-          services: [{ 
-            path: 'https://raw.githubusercontent.com/event-catalog/generator-openapi/refs/heads/main/examples/petstore/openapi.yml', 
-            id: 'cart-service' 
-          }],
+          services: [
+            {
+              path: 'https://raw.githubusercontent.com/event-catalog/generator-openapi/refs/heads/main/examples/petstore/openapi.yml',
+              id: 'cart-service',
+            },
+          ],
         });
 
         const service = await getService('cart-service', '3.0.0');

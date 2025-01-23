@@ -252,12 +252,12 @@ const getParsedSpecFile = (service: Service, document: OpenAPI.Document) => {
 };
 
 const getRawSpecFile = async (service: Service) => {
-  if(service.path.startsWith('http')){
+  if (service.path.startsWith('http')) {
     const file = await fetch(service.path, { method: 'GET' });
-    if(!file.ok){
+    if (!file.ok) {
       throw new Error(`Failed to fetch file: ${service.path}, status: ${file.status}`);
     }
     return await file.text();
   }
-  return await readFile(service.path, 'utf8')
+  return await readFile(service.path, 'utf8');
 };
