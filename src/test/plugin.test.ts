@@ -279,7 +279,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
             ],
           })
         );
-      })
+      });
 
       it('when the OpenAPI service is already defined in EventCatalog and the versions do not match, a new service is created and the old one is versioned', async () => {
         // Create a service with the same name and version as the OpenAPI file for testing
