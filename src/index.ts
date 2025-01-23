@@ -97,6 +97,8 @@ export default async (_: any, options: Props) => {
 
     // Process all messages for the OpenAPI spec
     let { sends, receives } = await processMessagesForOpenAPISpec(serviceSpec.path, document);
+    let owners = [];
+    let repository = null;
 
     // Check if service is already defined... if the versions do not match then create service.
     const latestServiceInCatalog = await getService(service.id, 'latest');
@@ -106,7 +108,8 @@ export default async (_: any, options: Props) => {
       serviceMarkdown = latestServiceInCatalog.markdown;
       serviceSpecificationsFiles = await getSpecificationFilesForService(service.id, 'latest');
       sends = latestServiceInCatalog.sends || ([] as any);
-
+      owners = latestServiceInCatalog.owners || ([] as any);
+      repository = latestServiceInCatalog.repository || null;
       // persist any specifications that are already in the catalog
       serviceSpecifications = {
         ...serviceSpecifications,
@@ -132,6 +135,8 @@ export default async (_: any, options: Props) => {
         specifications: serviceSpecifications,
         sends,
         receives,
+        ...(owners ? { owners } : {}),
+        ...(repository ? { repository } : {}),
       },
       { path: service.id, override: true }
     );

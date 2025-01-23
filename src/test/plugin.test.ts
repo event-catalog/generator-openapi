@@ -58,7 +58,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(await getDomain('orders', '1.0.0')).toBeUndefined();
       });
 
-      it('if a domain is defined in the OpenAPI file but the versions do not match, the existing domain is version and a new one is created', async () => {
+      it('if a domain is defined in the OpenAPI file but the versions do not match, the existing domain is versioned and a new one is created', async () => {
         const { writeDomain, getDomain } = utils(catalogDir);
 
         await writeDomain({
@@ -241,6 +241,45 @@ describe('OpenAPI EventCatalog Plugin', () => {
           })
         );
       });
+
+      it('when the OpenAPI service is already defined in the EventCatalog and the versions match, the owners and repository are persisted', async () => {
+        // Create a service with the same name and version as the OpenAPI file for testing
+        const { writeService, getService } = utils(catalogDir);
+
+        await writeService(
+          {
+            id: 'swagger-petstore',
+            version: '1.0.0',
+            name: 'Random Name',
+            markdown: 'Here is my original markdown, please do not override this!',
+            owners: ['dboyne'],
+            repository: { language: 'typescript', url: 'https://github.com/dboyne/eventcatalog-plugin-openapi' },
+          },
+          { path: 'Swagger Petstore' }
+        );
+
+        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+        const service = await getService('swagger-petstore', '1.0.0');
+        expect(service).toEqual(
+          expect.objectContaining({
+            id: 'swagger-petstore',
+            name: 'Swagger Petstore',
+            version: '1.0.0',
+            summary: 'This is a sample server Petstore server.',
+            markdown: 'Here is my original markdown, please do not override this!',
+            owners: ['dboyne'],
+            repository: { language: 'typescript', url: 'https://github.com/dboyne/eventcatalog-plugin-openapi' },
+            badges: [
+              {
+                content: 'Pets',
+                textColor: 'blue',
+                backgroundColor: 'blue',
+              },
+            ],
+          })
+        );
+      })
 
       it('when the OpenAPI service is already defined in EventCatalog and the versions do not match, a new service is created and the old one is versioned', async () => {
         // Create a service with the same name and version as the OpenAPI file for testing
