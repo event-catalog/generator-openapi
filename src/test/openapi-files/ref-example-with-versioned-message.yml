@@ -1,0 +1,49 @@
+openapi: '3.0.0'
+info:
+  title: Test Service
+  version: 1.1.0
+
+paths:
+  /v1/users:
+    get:
+      operationId: users
+      summary: List all users
+      responses:
+        200:
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSignup'
+  /v2/users:
+    get:
+      operationId: users2
+      summary: List all users
+      x-eventcatalog-message-version: 2.0.0
+      description: |
+        Returns a list of all users.
+        This operation is **deprecated**.
+      responses:
+        200:
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSignup'
+components:
+  schemas:
+    UserSignup:
+      $ref: 'ref-example-signup-message.yml'
+
+    Date:
+      type: string
+      format: date
+
+    DateWithExample:
+      $ref: '#/components/schemas/Date'
+      description: Date schema extended with a `default` value... Or not?
+      default: 2000-01-01
