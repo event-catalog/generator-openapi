@@ -170,7 +170,6 @@ export default async (_: any, options: Props) => {
 
 const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenAPI.Document) => {
   const operations = await getOperationsByType(pathToSpec);
-  const version = document.info.version;
   let receives = [],
     sends = [];
 
@@ -181,7 +180,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     const messageType = operation.type;
     const messageAction = operation.action;
 
-    console.log(chalk.blue(`Processing message: ${message.name} (v${version})`));
+    console.log(chalk.blue(`Processing message: ${message.name} (v${message.version})`));
 
     const { addFileToMessage, writeMessage, getMessage, versionMessage } = getMessageTypeUtils(
       process.env.PROJECT_DIR as string,
@@ -194,7 +193,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     if (catalogedMessage) {
       messageMarkdown = catalogedMessage.markdown;
       // if the version matches, we can override the message but keep markdown as it  was
-      if (catalogedMessage.version !== version) {
+      if (catalogedMessage.version !== message.version) {
         // if the version does not match, we need to version the message
         await versionMessage(message.id);
         console.log(chalk.cyan(` - Versioned previous message: (v${catalogedMessage.version})`));
@@ -204,7 +203,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
     // Write the message to the catalog
     await writeMessage({ ...message, markdown: messageMarkdown }, { path: message.id, override: true });
 
-    // If the message send or recieved by the service?
+    // If the message send or received by the service?
     if (messageAction === 'sends') {
       sends.push({
         id: message.id,
@@ -242,7 +241,7 @@ const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenA
       }
     }
 
-    console.log(chalk.cyan(` - Message (v${version}) created`));
+    console.log(chalk.cyan(` - Message (v${message.version}) created`));
     if (!operation.operationId) {
       console.log(chalk.yellow(`  - OperationId not found for ${operation.method} ${operation.path}, creating one...`));
       console.log(chalk.yellow(`  - Use operationIds to give better unique names for EventCatalog`));
