@@ -2,4 +2,4 @@
 '@eventcatalog/generator-openapi': minor
 ---
 
-Add support for x-eventcatalog-message-version
+feat(plugin): added support for x-eventcatalog-message-version
