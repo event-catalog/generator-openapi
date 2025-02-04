@@ -5,6 +5,11 @@ import { join } from 'node:path';
 import fs from 'fs/promises';
 import { vi } from 'vitest';
 
+// Add mock for the local checkLicense module
+vi.mock('../utils/checkLicense', () => ({
+  default: () => Promise.resolve(),
+}));
+
 // Fake eventcatalog config
 const config = {};
 
@@ -27,6 +32,8 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
   afterEach(async () => {
     await fs.rm(join(catalogDir), { recursive: true });
+    // hack to wait for async operations to finish in the tests...
+    await new Promise((resolve) => setTimeout(resolve, 250));
   });
 
   describe('service generation', () => {
@@ -239,45 +246,6 @@ describe('OpenAPI EventCatalog Plugin', () => {
         expect(service).toEqual(
           expect.objectContaining({
             sends: [{ id: 'usersignedup', version: '1.0.0' }],
-          })
-        );
-      });
-
-      it('when the OpenAPI service is already defined in the EventCatalog and the versions match, the owners and repository are persisted', async () => {
-        // Create a service with the same name and version as the OpenAPI file for testing
-        const { writeService, getService } = utils(catalogDir);
-
-        await writeService(
-          {
-            id: 'swagger-petstore',
-            version: '1.0.0',
-            name: 'Random Name',
-            markdown: 'Here is my original markdown, please do not override this!',
-            owners: ['dboyne'],
-            repository: { language: 'typescript', url: 'https://github.com/dboyne/eventcatalog-plugin-openapi' },
-          },
-          { path: 'Swagger Petstore' }
-        );
-
-        await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
-
-        const service = await getService('swagger-petstore', '1.0.0');
-        expect(service).toEqual(
-          expect.objectContaining({
-            id: 'swagger-petstore',
-            name: 'Swagger Petstore',
-            version: '1.0.0',
-            summary: 'This is a sample server Petstore server.',
-            markdown: 'Here is my original markdown, please do not override this!',
-            owners: ['dboyne'],
-            repository: { language: 'typescript', url: 'https://github.com/dboyne/eventcatalog-plugin-openapi' },
-            badges: [
-              {
-                content: 'Pets',
-                textColor: 'blue',
-                backgroundColor: 'blue',
-              },
-            ],
           })
         );
       });
@@ -926,6 +894,45 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
         expect(normalizeLineEndings(asyncAPIFile)).toEqual(normalizeLineEndings(expected));
       });
+    });
+
+    it('when the OpenAPI service is already defined in the EventCatalog and the versions match, the owners and repository are persisted', async () => {
+      // Create a service with the same name and version as the OpenAPI file for testing
+      const { writeService, getService } = utils(catalogDir);
+
+      await writeService(
+        {
+          id: 'swagger-petstore',
+          version: '1.0.0',
+          name: 'Random Name',
+          markdown: 'Here is my original markdown, please do not override this!',
+          owners: ['dboyne'],
+          repository: { language: 'typescript', url: 'https://github.com/dboyne/eventcatalog-plugin-openapi' },
+        },
+        { path: 'Swagger Petstore' }
+      );
+
+      await plugin(config, { services: [{ path: join(openAPIExamples, 'petstore.yml'), id: 'swagger-petstore' }] });
+
+      const service = await getService('swagger-petstore', '1.0.0');
+      expect(service).toEqual(
+        expect.objectContaining({
+          id: 'swagger-petstore',
+          name: 'Swagger Petstore',
+          version: '1.0.0',
+          summary: 'This is a sample server Petstore server.',
+          markdown: 'Here is my original markdown, please do not override this!',
+          owners: ['dboyne'],
+          repository: { language: 'typescript', url: 'https://github.com/dboyne/eventcatalog-plugin-openapi' },
+          badges: [
+            {
+              content: 'Pets',
+              textColor: 'blue',
+              backgroundColor: 'blue',
+            },
+          ],
+        })
+      );
     });
   });
 });

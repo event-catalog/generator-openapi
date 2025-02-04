@@ -34,9 +34,9 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@eventcatalog/sdk": "^1.4.4",
     "@apidevtools/swagger-parser": "^10.1.0",
     "@changesets/cli": "^2.27.7",
+    "@eventcatalog/sdk": "^1.4.4",
     "chalk": "^4",
     "js-yaml": "^4.1.0",
     "openapi-types": "^12.1.3",

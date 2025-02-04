@@ -18,6 +18,7 @@ type Props = {
   domain?: Domain;
   debug?: boolean;
   saveParsedSpecFile?: boolean;
+  licenseKey?: string;
 };
 
 export default async (_: any, options: Props) => {
@@ -28,6 +29,9 @@ export default async (_: any, options: Props) => {
   if (!process.env.PROJECT_DIR) {
     throw new Error('Please provide catalog url (env variable PROJECT_DIR)');
   }
+
+  // Check if the license is valid
+  await checkLicense(options.licenseKey);
 
   const {
     getDomain,
@@ -164,8 +168,6 @@ export default async (_: any, options: Props) => {
 
     console.log(chalk.cyan(` - Service (v${version}) created`));
   }
-
-  await checkLicense();
 };
 
 const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenAPI.Document) => {
