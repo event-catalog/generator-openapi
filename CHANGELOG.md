@@ -1,5 +1,11 @@
 # @eventcatalog/generator-openapi
 
+## 3.1.1
+
+### Patch Changes
+
+- f627a1b: chore(plugin): added check for licenses
+
 ## 3.1.0
 
 ### Minor Changes
