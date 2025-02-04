@@ -5,6 +5,11 @@ import { join } from 'node:path';
 import fs from 'fs/promises';
 import { vi } from 'vitest';
 
+// Add mock for the local checkLicense module
+vi.mock('../utils/checkLicense', () => ({
+  default: () => Promise.resolve()
+}));
+
 // Fake eventcatalog config
 const config = {};
 
