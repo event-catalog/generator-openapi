@@ -33,7 +33,7 @@ describe('OpenAPI EventCatalog Plugin', () => {
   afterEach(async () => {
     await fs.rm(join(catalogDir), { recursive: true });
     // hack to wait for async operations to finish in the tests...
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 250));
   });
 
   describe('service generation', () => {
