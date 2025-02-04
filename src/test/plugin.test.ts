@@ -7,7 +7,7 @@ import { vi } from 'vitest';
 
 // Add mock for the local checkLicense module
 vi.mock('../utils/checkLicense', () => ({
-  default: () => Promise.resolve()
+  default: () => Promise.resolve(),
 }));
 
 // Fake eventcatalog config

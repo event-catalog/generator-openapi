@@ -168,8 +168,6 @@ export default async (_: any, options: Props) => {
 
     console.log(chalk.cyan(` - Service (v${version}) created`));
   }
-
-  
 };
 
 const processMessagesForOpenAPISpec = async (pathToSpec: string, document: OpenAPI.Document) => {
