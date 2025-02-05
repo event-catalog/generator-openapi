@@ -118,7 +118,7 @@ export const buildMessage = async (pathToFile: string, document: OpenAPI.Documen
 
   return {
     id: extensions['x-eventcatalog-message-id'] || uniqueIdentifier,
-    version: document.info.version,
+    version: extensions['x-eventcatalog-message-version'] || document.info.version,
     name: extensions['x-eventcatalog-message-name'] || uniqueIdentifier,
     summary: getSummary(operation),
     markdown: defaultMarkdown(operation, requestBodiesAndResponses),

@@ -614,6 +614,56 @@ describe('OpenAPI EventCatalog Plugin', () => {
         );
       });
 
+      it('messages that do not have an `x-eventcatalog-message-version` header defined take the version of the service', async () => {
+        const { getQuery } = utils(catalogDir);
+
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'ref-example-with-versioned-message.yml'), id: 'swagger-petstore' }],
+        });
+
+        const command = await getQuery('users');
+
+        const dir = await fs.readdir(join(catalogDir, 'queries'));
+
+        const file = await fs.readFile(join(catalogDir, 'queries', 'users', 'index.md'));
+        expect(file).toBeDefined();
+
+        expect(command).toEqual(
+          expect.objectContaining({
+            id: 'users',
+            version: '1.1.0',
+            name: 'users',
+            summary: 'List all users',
+            badges: [{ content: 'GET', textColor: 'blue', backgroundColor: 'blue' }],
+          })
+        );
+      });
+
+      it('messages that do have an `x-eventcatalog-message-version` header defined take it as the version', async () => {
+        const { getQuery } = utils(catalogDir);
+
+        await plugin(config, {
+          services: [{ path: join(openAPIExamples, 'ref-example-with-versioned-message.yml'), id: 'swagger-petstore' }],
+        });
+
+        const command = await getQuery('users2');
+
+        const dir = await fs.readdir(join(catalogDir, 'queries'));
+
+        const file = await fs.readFile(join(catalogDir, 'queries', 'users2', 'index.md'));
+        expect(file).toBeDefined();
+
+        expect(command).toEqual(
+          expect.objectContaining({
+            id: 'users2',
+            version: '2.0.0',
+            name: 'users2',
+            summary: 'List all users',
+            badges: [{ content: 'GET', textColor: 'blue', backgroundColor: 'blue' }],
+          })
+        );
+      });
+
       describe('OpenAPI eventcatalog extensions', () => {
         it('messages marked as "events" using the custom `x-eventcatalog-message-type` header in an OpenAPI are documented in EventCatalog as events ', async () => {
           const { getEvent } = utils(catalogDir);
