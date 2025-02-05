@@ -657,7 +657,6 @@ describe('OpenAPI EventCatalog Plugin', () => {
 
         const dir = await fs.readdir(join(catalogDir, 'queries'));
 
-
         const file = await fs.readFile(join(catalogDir, 'queries', 'users', 'index.md'));
         expect(file).toBeDefined();
 
@@ -682,7 +681,6 @@ describe('OpenAPI EventCatalog Plugin', () => {
         const command = await getQuery('users2');
 
         const dir = await fs.readdir(join(catalogDir, 'queries'));
-
 
         const file = await fs.readFile(join(catalogDir, 'queries', 'users2', 'index.md'));
         expect(file).toBeDefined();
